@@ -133,6 +133,7 @@ namespace JWTAuthentication.WebApi.Services
 
         }
 
+        //TODO : Update User Details
         //TODO : Remove User from Role 
     }
 }

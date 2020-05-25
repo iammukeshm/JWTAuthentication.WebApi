@@ -22,7 +22,7 @@ namespace JWTAuthentication.WebApi.Controllers
         [Authorize(Roles ="Administrator")]
         public async Task<IActionResult> PostSecuredData()
         {
-            return Ok("This Secured Data is available only for Authenticated Users.");
+            return Ok("This Secured Data is available only for Administrators.");
         }
     }
 }
