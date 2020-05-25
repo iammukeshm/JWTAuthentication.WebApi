@@ -14,7 +14,13 @@ namespace JWTAuthentication.WebApi.Controllers
     public class SecuredController : ControllerBase
     {
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetSecuredData()
+        {
+            return Ok("This Secured Data is available only for Authenticated Users.");
+        }
+        [HttpPost]
+        [Authorize(Roles ="Administrator")]
+        public async Task<IActionResult> PostSecuredData()
         {
             return Ok("This Secured Data is available only for Authenticated Users.");
         }
