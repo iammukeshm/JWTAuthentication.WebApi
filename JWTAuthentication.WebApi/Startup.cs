@@ -68,7 +68,7 @@ namespace JWTAuthentication.WebApi
                         ValidateAudience = true,
                         ValidateLifetime = true,
                         ClockSkew = TimeSpan.Zero,
-
+                        
                         ValidIssuer = _configuration["JWT:Issuer"],
                         ValidAudience = _configuration["JWT:Audience"],
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Key"]))

@@ -1,4 +1,5 @@
-﻿using JWTAuthentication.WebApi.Models;
+﻿using JWTAuthentication.WebApi.Entities;
+using JWTAuthentication.WebApi.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
