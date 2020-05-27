@@ -47,7 +47,7 @@ namespace JWTAuthentication.WebApi.Services
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    await _userManager.AddToRoleAsync(user, Authorization.default_role.ToString());                 
+                    await _userManager.AddToRoleAsync(user, Authorization.default_role.ToString());
 
                 }
                 return $"User Registered with username {user.UserName}";
@@ -77,7 +77,7 @@ namespace JWTAuthentication.WebApi.Services
                 var rolesList = await _userManager.GetRolesAsync(user).ConfigureAwait(false);
                 authenticationModel.Roles = rolesList.ToList();
 
-               
+
                 if (user.RefreshTokens.Any(a => a.IsActive))
                 {
                     var activeRefreshToken = user.RefreshTokens.Where(a => a.IsActive == true).FirstOrDefault();
@@ -104,7 +104,7 @@ namespace JWTAuthentication.WebApi.Services
         private RefreshToken CreateRefreshToken()
         {
             var randomNumber = new byte[32];
-            using(var generator = new RNGCryptoServiceProvider())
+            using (var generator = new RNGCryptoServiceProvider())
             {
                 generator.GetBytes(randomNumber);
                 return new RefreshToken
@@ -166,7 +166,7 @@ namespace JWTAuthentication.WebApi.Services
                     var validRole = Enum.GetValues(typeof(Authorization.Roles)).Cast<Authorization.Roles>().Where(x => x.ToString().ToLower() == model.Role.ToLower()).FirstOrDefault();
                     await _userManager.AddToRoleAsync(user, validRole.ToString());
                     return $"Added {model.Role} to user {model.Email}.";
-                } 
+                }
                 return $"Role {model.Role} not found.";
             }
             return $"Incorrect Credentials for user {user.Email}.";
@@ -193,8 +193,16 @@ namespace JWTAuthentication.WebApi.Services
                 return authenticationModel;
             }
 
-            // generate new jwt
-           
+            //Revoke Current Refresh Token
+            refreshToken.Revoked = DateTime.UtcNow;
+
+            //Generate new Refresh Token and save to Database
+            var newRefreshToken = CreateRefreshToken();
+            user.RefreshTokens.Add(newRefreshToken);
+            _context.Update(user);
+            _context.SaveChanges();
+
+            //Generates new jwt
             authenticationModel.IsAuthenticated = true;
             JwtSecurityToken jwtSecurityToken = await CreateJwtToken(user);
             authenticationModel.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
@@ -202,8 +210,8 @@ namespace JWTAuthentication.WebApi.Services
             authenticationModel.UserName = user.UserName;
             var rolesList = await _userManager.GetRolesAsync(user).ConfigureAwait(false);
             authenticationModel.Roles = rolesList.ToList();
-            authenticationModel.RefreshToken = refreshToken.Token;
-            authenticationModel.RefreshTokenExpiration = refreshToken.Expires;
+            authenticationModel.RefreshToken = newRefreshToken.Token;
+            authenticationModel.RefreshTokenExpiration = newRefreshToken.Expires;
             return authenticationModel;
         }
         public bool RevokeToken(string token)
